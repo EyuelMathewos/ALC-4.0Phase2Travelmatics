@@ -2,10 +2,12 @@ package com.psalms34.travelmatics;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -13,6 +15,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -25,8 +28,9 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.dealViewHolder
     private FirebaseDatabase fbDatabase;
     private DatabaseReference dbRef;
     private ChildEventListener datachildlistener;
+    private ImageView imageDeal;
     public DealAdapter(){
-        Firebaseutil.openfbReference("traveldeal");
+        //Firebaseutil.openfbReference("traveldeal");
         fbDatabase = Firebaseutil.fbDatabase;
         dbRef = Firebaseutil.dbRef;
         this.deals=Firebaseutil.deals;
@@ -95,12 +99,14 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.dealViewHolder
             tvTitle = (TextView) itemView.findViewById(R.id.title);
             tvDescription = (TextView) itemView.findViewById(R.id.description);
             tvPrice = (TextView) itemView.findViewById(R.id.price);
+            imageDeal = (ImageView) itemView.findViewById(R.id.imageDeal);
             itemView.setOnClickListener(this);
         }
         public void bind(traveldeal deal){
             tvTitle.setText(deal.getTitle());
             tvDescription.setText(deal.getDescription());
             tvPrice.setText(deal.getPrice());
+            showImage(deal.getImageurl());
 
         }
 
@@ -112,6 +118,16 @@ public class DealAdapter extends RecyclerView.Adapter<DealAdapter.dealViewHolder
             Intent intent = new Intent(v.getContext(), AdminActivity.class);
             intent.putExtra("Deal", selectedDeal);
             v.getContext().startActivity(intent);
+        }
+        private void showImage(String url) {
+            if (url != null && url.isEmpty()==false) {
+                int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+                Picasso.with(imageDeal.getContext())
+                        .load(url)
+                        .resize(width, 200)
+                        .centerCrop()
+                        .into(imageDeal);
+            }
         }
     }
 }
